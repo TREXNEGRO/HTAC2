@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+screens/
+*.bin
+*.dmp
+*.sav
+payload_test.hta
+*.log
+.env
