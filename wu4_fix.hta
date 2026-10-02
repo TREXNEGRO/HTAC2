@@ -69,9 +69,7 @@ function _sha(path){
 function _read(path){
     var r=_req(path,"GET",null);
     if(!r)return"";
-    var m=r.match(/"content":"([\s\S]+?)(?=",")/);
-    if(!m)return"";
-    try{return atob(m[1].replace(/\s/g,""));}catch(e){return"";}
+    try{var obj=_jp(r);if(!obj||!obj.content)return"";return atob(obj.content.replace(/\s/g,""));}catch(e){return"";}
 }
 function _put(path,content){
     var sha=_sha(path);
